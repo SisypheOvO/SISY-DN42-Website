@@ -1,0 +1,27 @@
+{
+    "name": "dn42-web",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc -b && vite build",
+        "format": "prettier --write . --end-of-line auto",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "vue": "^3.5.33",
+        "vue-i18n": "^11.4.0"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.2.4",
+        "@types/node": "^25.6.0",
+        "@vitejs/plugin-vue": "^6.0.6",
+        "prettier": "^3.8.3",
+        "rollup-plugin-visualizer": "^7.0.1",
+        "tailwindcss": "^4.2.4",
+        "typescript": "^6.0.3",
+        "vite": "^8.0.10",
+        "vue-tsc": "^3.2.7"
+    }
+}
