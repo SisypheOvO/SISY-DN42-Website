@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "vite",
         "build": "vue-tsc -b && vite build",
-        "format": "prettier --write . --end-of-line auto",
+        "format": "prettier --write ./src --end-of-line auto",
         "preview": "vite preview"
     },
     "dependencies": {

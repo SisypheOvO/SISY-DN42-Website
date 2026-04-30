@@ -1,45 +1,80 @@
-import { onMounted, onBeforeUnmount, ref } from "vue"
+import { onBeforeUnmount, ref } from "vue"
 
-export default function useScrollSpy(options?: { offset?: number; rootMargin?: string }) {
+export default function useScrollSpy() {
     const current = ref<string | null>(null)
-    let observer: IntersectionObserver | null = null
+    let elements: HTMLElement[] = []
+    let lastId: string | null = null
+    let ticking = false
+    let onScroll: (() => void) | null = null
 
-    function init(ids: string[]) {
-        if (typeof window === "undefined" || !window.IntersectionObserver) return
+    function updateHash(id: string) {
+        if (!id || id === current.value) return
+        current.value = id
+        try {
+            const url = new URL(window.location.href)
+            url.hash = `#${id}`
+            history.replaceState(null, document.title, url.toString())
+        } catch {
+            window.location.hash = id
+        }
+    }
 
-        const offset = options?.offset ?? 0
-        const rootMargin = options?.rootMargin ?? `-50% 0px -50% 0px`
+    function detect() {
+        // touching the bottom of the page should activate the last section
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+        if (atBottom && lastId) {
+            updateHash(lastId)
+            return
+        }
 
-        const elements = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[]
-        if (!elements.length) return
+        // find the element whose top is closest to the center of the viewport but not below it
+        const center = window.innerHeight / 2
+        let closest: HTMLElement | null = null
+        let minDist = Infinity
 
-        const cb: IntersectionObserverCallback = (entries) => {
-            // choose the entry with largest intersection ratio
-            const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-
-            if (visible) {
-                const id = visible.target.id
-                if (id && id !== current.value) {
-                    current.value = id
-                    // update URL hash without scrolling
-                    try {
-                        const url = new URL(window.location.href)
-                        url.hash = `#${id}`
-                        history.replaceState(null, document.title, url.toString())
-                    } catch (e) {
-                        window.location.hash = id
-                    }
+        for (const el of elements) {
+            const rect = el.getBoundingClientRect()
+            // only consider elements whose top is already in the viewport (top <= center)
+            if (rect.top <= center) {
+                const dist = center - rect.top
+                if (dist < minDist) {
+                    minDist = dist
+                    closest = el
                 }
             }
         }
 
-        observer = new IntersectionObserver(cb, { root: null, rootMargin, threshold: [0, 0.25, 0.5, 0.75, 1] })
-        elements.forEach((el) => observer?.observe(el))
+        if (closest) updateHash(closest.id)
+    }
+
+    function init(ids: string[]) {
+        if (typeof window === "undefined") return
+
+        elements = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[]
+        if (!elements.length) return
+
+        lastId = ids[ids.length - 1]
+
+        onScroll = () => {
+            if (!ticking) {
+                ticking = true
+                requestAnimationFrame(() => {
+                    detect()
+                    ticking = false
+                })
+            }
+        }
+
+        window.addEventListener("scroll", onScroll, { passive: true })
+        // detect in case the page is not scrolled to top when loaded
+        detect()
     }
 
     function destroy() {
-        observer?.disconnect()
-        observer = null
+        if (onScroll) {
+            window.removeEventListener("scroll", onScroll)
+            onScroll = null
+        }
     }
 
     onBeforeUnmount(() => destroy())
