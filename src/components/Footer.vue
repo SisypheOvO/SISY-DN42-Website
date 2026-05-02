@@ -11,7 +11,7 @@
                 <img :src="githubIcon" class="h-5 w-5" alt="" aria-hidden="true" />
             </a>
 
-            <p class="m-0 text-[0.95rem] text-[#8888a0]">© {{ baseInfo.from_date }} {{ baseInfo.network_name }}. {{ baseInfo.asn }}</p>
+            <p class="m-0 text-[0.95rem] leading-none text-[#8888a0]">© {{ baseInfo.from_date }} {{ baseInfo.network_name }}. {{ baseInfo.asn }}</p>
         </div>
     </footer>
 </template>
