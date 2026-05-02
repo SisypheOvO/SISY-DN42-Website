@@ -1,74 +1,50 @@
-# SISY's DN42 Network Website
+# DN42 Network Info Template
 
 ![License](https://img.shields.io/badge/license-MIT-orange.svg) ![Vue](https://img.shields.io/badge/Vue-3.5-42b883.svg) ![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)
 
-## Usage
+This repository is a template for a DN42-style network information website. Use it as a starting point, then replace the site-specific data with your own network information.
 
-If you want to deploy this project on your own server, you can follow the instructions below.
+## Quick Start
 
-### Data
+1. Create a new repository from this template on GitHub.
+2. Install dependencies.
+3. Edit the data in [src/data/index.ts](src/data/index.ts) to match your own network.
+4. Build and deploy with your preferred workflow.
 
-All variables you may need to change is stored in the `/data/index.ts` file. You should edit these variables first.
+## What To Customize
 
-> [!IMPORTANT]
-> Make sure to keep all things related to YOUR OWN NETWORK leaving none of my network information in the file.
->
-> This is important for both you and me.
+The main content is centralized in [src/data/index.ts](src/data/index.ts). Start there and replace:
 
-### Build and deploy
+- Network name and ASN information.
+- Contact links such as email, Telegram, or GitHub.
+- Node list entries, endpoints, keys, and routing details.
 
-#### Use GitHub Actions
+You should also review [src/i18n/langs/en.ts](src/i18n/langs/en.ts) and [src/i18n/langs/zh.ts](src/i18n/langs/zh.ts) if you want to rename labels or page copy.
 
-If you want to use GitHub Actions for deployment, you can follow the instructions below.
+## Deployment
 
-1. Fork this repository.
-2. Go to the "Settings" of your forked repository, then go to "Secrets and variables" > "Actions".
-3. Add the following secrets:
-   - `SERVER_HOST`: Your server's IP address or hostname.
-   - `SERVER_USER`: Your server's SSH username. It is recommended to use a non-root user with limited permissions for security reasons.
-   - `SSH_PRIVATE_KEY`: Your SSH private key (make sure it has access to your server AND DO NOT LEAK IT).
-   - `SERVER_PORT` (optional): Your server's SSH port (default 22).
-   - `SERVER_DEPLOY_PATH`: The path on your server where the project is deployed (e.g., `/home/user/sisy-dn42-website`).
-4. Commit and push your changes to the `main` branch of your forked repository.
-5. GitHub Actions will automatically build and deploy the project to your server hopefully.
+### GitHub Actions
 
-#### Compose by yourself
+If you want to deploy with GitHub Actions, add the following repository secrets:
 
-This project is a static site, so it is recommended to use multi-stage building in production: first use Vite to generate `dist`, then use Nginx to serve the static files.
+- `SERVER_HOST`: Your server's IP address or hostname.
+- `SERVER_USER`: Your server's SSH username. A non-root user with limited permissions is recommended.
+- `SSH_PRIVATE_KEY`: Your SSH private key.
+- `SERVER_PORT` (optional): Your server's SSH port, default `22`.
+- `SERVER_DEPLOY_PATH`: The path on your server where the project is deployed.
 
-Startup command:
+After that, push changes to the default branch and the workflow in [.github/workflows/deploy-ssh.yml](.github/workflows/deploy-ssh.yml) will build and deploy automatically.
+
+### Docker Compose
+
+This project is a static site, so production deployment usually follows a multi-stage flow: build with Vite, then serve the generated files with Nginx.
 
 ```bash
-git clone git@github.com:SisypheOvO/SISY-DN42-Website.git
 docker compose up -d --build
 ```
 
-### After deployment
+If you want to run it behind an existing reverse proxy, forward traffic to the host port exposed by `compose.yaml`.
 
-The default configuration will bind the container's `80` port to the host's `127.0.0.1:8080`. If your host already has Nginx running, you can proxy traffic from `dn42.sisy.cc` on port 443 to `http://127.0.0.1:8080`.
+## Template TODO
 
-Example site configuration:
-
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name dn42.sisy.cc;
-
-    ssl_certificate     /path/to/fullchain.pem;
-    ssl_certificate_key /path/to/privkey.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-## TODO
-
-- [ ] Batch ping tool for nodes (may need backend support)
-- [ ] Better peering policy
+- [ ] Add a batch ping tool for nodes (may need backend support)

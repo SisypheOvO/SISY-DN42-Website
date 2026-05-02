@@ -1,4 +1,5 @@
 import { createI18n } from "vue-i18n"
+import { i18nLocalKey } from "@/data"
 import zh from "./langs/zh"
 import en from "./langs/en"
 
@@ -6,7 +7,7 @@ export type MessageSchema = typeof zh
 
 export type Locale = "zh" | "en"
 
-export const LOCALE_KEY = "sisy-dn42-lang"
+export const LOCALE_KEY = i18nLocalKey
 
 function getInitialLocale(): Locale {
     if (typeof window === "undefined") {

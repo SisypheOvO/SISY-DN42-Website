@@ -1,6 +1,6 @@
 <template>
     <nav class="fixed left-0 right-0 top-0 z-20 flex items-center justify-between border-b border-(--border-panel) bg-[rgba(10,10,15,0.8)] px-4 py-3 backdrop-blur-[20px] md:px-12">
-        <a class="inline-flex items-center gap-3 text-[#f0f0f5]" href="#top" aria-label="SISY Network">
+        <a class="inline-flex items-center gap-3 text-[#f0f0f5]" href="#top" :aria-label="baseInfo.network_name">
             <img class="h-10 w-10 rounded-full" src="/hero.png" alt="" />
             <span class="text-[1.25rem] font-semibold tracking-[-0.02em] whitespace-pre">{{ baseInfo.as_name + "   ·   " + baseInfo.asn_short }}</span>
         </a>
@@ -22,6 +22,7 @@
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import type { Locale } from "@/i18n"
+import { LOCALE_KEY } from "@/i18n"
 import { baseInfo } from "@/data"
 
 const props = defineProps<{ activeSection?: string | null }>()
@@ -32,7 +33,7 @@ const locale = computed(() => i18n.locale.value as Locale)
 function setLocale(lang: Locale) {
     i18n.locale.value = lang
     try {
-        window.localStorage.setItem("sisy-dn42-lang", lang)
+        window.localStorage.setItem(LOCALE_KEY, lang)
     } catch {
         // ignore storage errors
     }

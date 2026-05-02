@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: sisy-dn42-website:latest
+    image: network-website-template:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
